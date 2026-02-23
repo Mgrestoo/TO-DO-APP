@@ -1,0 +1,2 @@
+# normalize text files and let Git decide what is text
+* text=auto

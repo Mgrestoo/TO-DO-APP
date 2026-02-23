@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}My Tasks - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>My Tasks</h1>
+    <p>{{ tasks.count }} task{{ tasks.count|pluralize }}</p>
+</div>
+
+<div class="mb-4">
+    <a href="{% url 'create_task' %}" class="btn btn-primary btn-lg">
+        + Create New Task
+    </a>
+</div>
+
+{% if tasks %}
+    <div class="row">
+        {% for task in tasks %}
+            <div class="col-md-6 mb-4">
+                <div class="card task-card {% if task.is_completed %}completed{% endif %}">
+                    <div class="card-body">
+                        <h5 class="task-title">{{ task.title }}</h5>
+                        
+                        {% if task.description %}
+                            <p class="task-description">{{ task.description }}</p>
+                        {% endif %}
+                        
+                        <div class="task-meta">
+                            {% if task.is_completed %}
+                                <span class="badge bg-success">✓ Completed</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">⏳ Pending</span>
+                            {% endif %}
+                            <span class="ms-2">Created {{ task.created_at|date:"M d, Y" }}</span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-3">
+                            <!-- Toggle Complete Button -->
+                            <form method="POST" action="{% url 'toggle_task' task.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm {% if task.is_completed %}btn-warning{% else %}btn-success{% endif %}">
+                                    {% if task.is_completed %}
+                                        ↺ Mark Incomplete
+                                    {% else %}
+                                        ✓ Mark Complete
+                                    {% endif %}
+                                </button>
+                            </form>
+                            
+                            <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-secondary">
+                                ✎ Edit
+                            </a>
+                            
+                            <form method="POST" action="{% url 'delete_task' task.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this task?')">
+                                    🗑 Delete
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Show and Manage Categories -->
+                        <div class="mt-3">
+                            <div class="mb-2">
+                                <strong>Categories:</strong>
+                                {% if task.categories.all %}
+                                    <div>
+                                        {% for category in task.categories.all %}
+                                            <span class="badge bg-info d-inline-block mb-1">
+                                                {{ category.name }}
+                                                <form method="POST" action="{% url 'remove_category' task.id category.id %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-weight: bold; padding: 0; margin-left: 5px;">×</button>
+                                                </form>
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted small">No categories assigned</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Add Category Form -->
+                                                    <!-- Add Category Form -->
+                            <!-- Add Category Form -->
+                <div class="mb-2">
+                    <label class="form-label small" style="font-weight: 600;">Add Category:</label>
+                    <div class="d-flex gap-1 flex-wrap">
+                        {% for category in all_categories %}
+                            <form method="POST" action="{% url 'assign_category' task.id category.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-info">
+                                    + {{ category.name }}
+                                </button>
+                            </form>
+                        {% endfor %}
+                    </div>
+                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card text-center py-5">
+        <div class="card-body">
+            <h5 class="card-title mb-3">No tasks yet</h5>
+            <p class="text-muted mb-4">Create your first task to get started.</p>
+            <a href="{% url 'create_task' %}" class="btn btn-primary">Create a Task</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
