@@ -1,14 +1,32 @@
 from django.shortcuts import redirect, render
 from django.db.models import Max
 from django.db import models
-from .forms import RegisterForm, LoginForm, TaskForm
+from .forms import RegisterForm, LoginForm, TaskForm, UserProfileForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Task, Category, TaskCategory
+from .models import Task, Category, TaskCategory, UserProfile
 
 
 # Create your views here.
+
+def profile_view(request):
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('task_list')
+    else:
+        form = UserProfileForm(instance=profile)
+    return render(request, 'tasks/profile.html', {'form': form, 'profile': profile})
+        
+def home_view(request):
+    if request.user.is_authenticated:
+        return redirect('task_list')
+    else:
+        return redirect('register')
 def register_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -31,13 +49,14 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
+                messages.success(request, 'Logged in successfully!')
                 return redirect('task_list')
             else:
                 form.add_error(None, 'Invalid Username or Password')
-        else:
+    else:
             form = LoginForm()
             
-    return render(request, 'tasks/login.html', {'form': LoginForm()})
+    return render(request, 'tasks/login.html', {'form': form})
 
 @login_required
 def tasklist_view(request):

@@ -1,8 +1,12 @@
 from django.contrib import admin
-from .models import Task, Category, TaskCategory
+from .models import Task, Category, TaskCategory, UserProfile
 from tasks import models
 
 # Register your models here.
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'created_at')
+    search_fields = ('user__username',)
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
