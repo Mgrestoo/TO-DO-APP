@@ -4,19 +4,6 @@ A clean, modern task management application built with Django. Manage your tasks
 
 ---
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features Overview](#features-overview)
-- [Future Enhancements](#future-enhancements)
-- [Contributing](#contributing)
-
----
-
 ## ✨ Features
 
 ### Core Features
